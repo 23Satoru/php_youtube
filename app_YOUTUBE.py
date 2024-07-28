@@ -19,15 +19,12 @@ def video_search(youtube, q='自動化', max_results=50):
     # max_results = 50
     response = youtube.search().list(
         q=q,
-        # idは不要なので削除
         part="snippet",
-        #視聴回数が多い順に取得
+        #視聴数が多い順
         order='viewCount',
-        # ビデオ形式のみ取得    
+        # ビデオ形式のみ    
         type='video',
         maxResults=max_results,
-    #     # 必要なデータを絞り込み    
-    #     fields='items(id(videoId), snippet(channelId, title, description, channelTitle))'
     ).execute()
 
     items_id = []
@@ -48,7 +45,7 @@ def get_results(df_video, threshold=50000):
     subscriber_list = youtube.channels().list(
         id=','.join(channel_ids),
         part='statistics',
-        # 必要なデータを絞り込み
+        # 絞り込み
         fields='items(id,statistics(subscriberCount))'
     ).execute()
 
@@ -88,14 +85,14 @@ def get_results(df_video, threshold=50000):
 
     try:
         results = pd.merge(left=df_extracted, right=df_videos_info, on='video_id')
-        #     カラム並び替え
+        #並び替え
         results = results.loc[:, ['video_id', 'title', 'view_count', 'subscriber_count', 'channel_id']]
     except:
         results = pd.DataFrame()
 
     return results
 
-# 以下、Streamlit部分
+#Streamlit
 
 st.title('YouTube分析アプリ')
 
@@ -133,6 +130,6 @@ if st.button('ビデオ表示'):
         except:
             st.error(
                 """
-                **おっと！何かエラーが起きているようです。** :(
+                **エラーが発生しました。** :(
             """
             )
